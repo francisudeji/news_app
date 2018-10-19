@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-    max-width: 960px;
+    max-width: 768px;
     margin: 0 auto;
 }
 
@@ -70,6 +70,6 @@ header {
 
 @media all and (max-width: 768px) {
     .container {
-        width: 90%;
+        width: 96%;
     }
 }

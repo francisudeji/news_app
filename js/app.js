@@ -49,7 +49,7 @@ function displayHeadlines(title, urlToImage, url) {
     entryPoint.innerHTML += `
         <div class="card">
             <div class="card-image">
-                <img src="${urlToImage}" alt="Picture of cat">
+                <img src="${urlToImage}">
             </div>
             <div class="card-body">
                 <h3>${title}</h3>

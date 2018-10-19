@@ -1,4 +1,4 @@
-const cacheV1 = "news-app-cache-files";
+const CACHE_NAME = "static-cache";
 const filesToCache = [
   "/index.html",
   "/manifest.json",
@@ -20,15 +20,12 @@ const filesToCache = [
 // install event
 self.addEventListener("install", e => {
   console.log("[sw installed]");
-  e.waitUntil(
-    caches
-      .open(cacheV1)
-      .then(cache => {
-        console.log("[SW] Caching cachefiles");
-        return cache.addAll(filesToCache);
-      })
-      .catch(error => console.log({ error }))
-  );
+	e.waitUntil(
+		caches.open(CACHE_NAME)
+			.then(cache => {
+				cache.addAll(filesToCache);
+			})
+	);
 });
 
 // activate event
@@ -38,39 +35,27 @@ self.addEventListener("activate", e => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheV1 === cacheName) return caches.delete(cacheName);
+          if (cacheName !== CACHE_NAME){
+            console.log("[SW] deleting cached files from", cacheName);
+		  	return caches.delete(cacheName);
+		  }
         })
       );
     })
   );
 });
 
-// fetch event
-self.addEventListener("fetch", e => {
-  console.log("[SW fetched]");
-  e.respondWith(
-    caches.match(e.request).then(response => {
-      if (response) {
-        console.log("[SW] found in cache", e.request.url);
-        return response;
-      }
 
-      const requestClone = e.request.clone();
-
-      fetch(requestClone)
-        .then(response => {
-          if (!response) {
-            console.log("[SW] no response");
-            return response;
-          }
-
-          const responseClone = response.clone();
-          caches.open(cacheV1).then(cache => {
-            cache.put(e.request, responseClone);
-            return response;
-          });
-        })
-        .catch(error => console.log("[SW] ERROR Fetching ", {error}));
-    })
-  );
+self.addEventListener('fetch', (event) => {
+	event.respondWith(
+		caches.open(CACHE_NAME).then((cache) => {
+			return cache.match(event.request).then((response) => {
+				const promise = fetch(event.request).then((networkResponse) => {
+					cache.put(event.request, networkResponse.clone());
+					return networkResponse;
+				})
+				return response || promise;
+			})
+		})
+	);
 });
