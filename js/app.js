@@ -34,8 +34,10 @@ function fetchHeadlines() {
             const { articles } = data;
             articles.map(article => {
                 const { title, url, urlToImage } = article;
-                loader.style.display = "none";
-                displayHeadlines(title, urlToImage, url);
+                if(urlToImage !== null) {
+                    loader.style.display = "none";
+                    displayHeadlines(title, urlToImage, url);
+                }
             }).join("");
         })
         .catch(error => console.log({error}));
